@@ -49,6 +49,7 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
             ],
             "scripts": []
@@ -144,6 +145,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "monAgence"
+    }
+  },
+  "defaultProject": "monAgence",
+  "cli": {
+    "analytics": "d2a1a333-3b3c-4312-bab2-b8a6404d6819"
+  }
 }

@@ -1,0 +1,146 @@
+<div class="rounded shadow bg-white p-5">
+  <div class="row">
+    <div class="col-12 d-flex">
+      <h2 class="font-weight-light"><i class="fas fa-home"></i> Biens immobiliers</h2>
+      <button class="btn btn-primary ml-auto" type="button" data-toggle="modal" data-target="#propertiesFormModal"
+              (click)="resetForm()"><i class="fas fa-plus"></i> Ajouter un bien
+      </button>
+    </div>
+  </div>
+  <hr class="mt-1 mb-5 bg-dark">
+  <div class="row">
+    <div *ngFor="let property of properties; let i = index" class="col-12 shadow-sm p-4 mb-3 bg-light">
+      <div class="row">
+        <div class="col-3">
+          <div *ngFor="let photo of property.photos; let first = first">
+            <img *ngIf="first" [src]="photo" class="w-100">
+          </div>
+        </div>
+        <div class="col-9">
+          <div class="d-flex">
+            <h3 class="font-weight-normal">{{property.title}}</h3>
+            <div class="ml-auto">
+              <button class="btn btn-primary m-1" type="button" (click)="onEditProperty(property)"><i
+                class="fas fa-edit"></i></button>
+              <button class="btn btn-danger m-1" type="button" (click)="onDeleteProperty(i)"><i
+                class="fas fa-trash-alt"></i></button>
+            </div>
+          </div>
+          <p>
+            {{ property.category }} <span *ngIf="property.surface && property.surface != ''">de {{ property.surface }}
+            m²</span> <span *ngIf="property.rooms && property.rooms != ''">, {{ property.rooms }} pièces.</span>
+          </p>
+          <p *ngIf="property.description && property.description != ''">
+            {{ property.description }}
+          </p>
+          <p *ngIf="property.price && property.price != ''">
+            {{ property.price }}€
+          </p>
+          <p>
+            <span class="text-success" *ngIf="property.sold">Vendu</span>
+            <span class="text-danger" *ngIf="!property.sold">A vendre</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+
+<div class="modal fade" id="propertiesFormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form [formGroup]="propertiesForm" (ngSubmit)="onSubmitPropertiesForm()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Édition d'un bien</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <input type="text" class="form-control" required placeholder="Titre" formControlName="title" ngModel>
+          </div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="inputGroupSelect01">Catégorie</label>
+            </div>
+            <select class="custom-select" id="inputGroupSelect01" formControlName="category">
+              <option value="Appartement">Appartement</option>
+              <option value="Maison">Maison</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-6">
+              <input type="number" placeholder="Surface (m²)" class="form-control" formControlName="surface">
+            </div>
+            <div class="form-group col-6">
+              <input type="number" placeholder="Nombre de pièces" class="form-control" formControlName="rooms">
+            </div>
+          </div>
+          <div class="form-group">
+            <textarea rows="4" class="form-control w-100" placeholder="Description du bien"
+                      formControlName="description"></textarea>
+          </div>
+          <div class="form-group">
+            <input type="number" placeholder="Prix" class="form-control" formControlName="price">
+          </div>
+          <div class="row">
+            <div *ngFor="let photo of photosAdded; let i = index" class="col-4 border border-secondary rounded m-1 p-1 bg-light position-relative">
+              <span class="text-danger position-absolute m-1 deletePhoto">
+                <i class="fas fa-times" (click)="onRemoveAddedPhoto(i)"></i>
+              </span>
+              <img [src]="photo" class="w-100">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-9">
+              <div class="input-group mb-3">
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="inputGroupFile01" (change)="onUploadFile($event)">
+                  <label class="custom-file-label" for="inputGroupFile01">Envoyer une image</label>
+                </div>
+              </div>
+            </div>
+            <div class="col-3">
+              <div class="spinner-border text-primary" role="status" *ngIf="photoUploading">
+                <span class="sr-only">Loading...</span>
+              </div>
+            </div>
+          </div>
+          <div class="custom-control custom-switch text-center">
+            <input type="checkbox" class="custom-control-input" id="customSwitch1" formControlName="sold">
+            <label class="custom-control-label" for="customSwitch1">
+              <span *ngIf="propertiesForm.value.sold" class="text-success">Vendu</span>
+              <span *ngIf="!propertiesForm.value.sold" class="text-danger">A vendre</span></label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+          <button type="button" class="btn btn-primary" type="submit" [disabled]="propertiesForm.invalid">Enregistrer
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- Modal suppression -->
+<div class="modal fade" id="deletePropertyModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Supprimer ce bien ?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+        <button type="button" class="btn btn-danger" (click)="onConfirmDeleteProperty()">Supprimer</button>
+      </div>
+    </div>
+  </div>
+</div>
